@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>restaurant</title>
+</head>
+<body >
+    <form onsubmit="savetocrudcrudstorage(event)">
+        <!-- <label for="product">product</label>
+        <input type="text" id="product" placeholder="enter product"> -->
+        <label for="price">price</label>
+        <input type="number" id="price" placeholder="enter price">
+        <label for="quantity">Choose Dish</label>
+        <select id="quantity">
+            <option value="biriyani">biriyani</option>
+            <option value="salad">salad</option>
+            <option value="paneer">paneer</option>
+            <option value="tandoor">tandoor</option>
+        </select>
+        
+        <label for="description">Table</label>
+       <select name="table" id="description">
+        <option value="Table1">Table1</option>
+        <option value="Table2">Table2</option>
+        <option value="Table3">Table3</option>
+       </select>
+        <button type="submit">add item</button>
+    </form>
+    <ul id="listofitem">
+        <h2>Table1</h2>
+        <h2>Table2</h2>
+        <h2>Table3</h2> 
+
+    </ul>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.3.6/axios.min.js"></script>
+    <script>
+        function savetocrudcrudstorage(event)
+        {  event.preventDefault();
+            // const product = event.target.product.value;
+            const price = event.target.price.value;
+            const quantity = event.target.quantity.value;
+            const description = event.target.description.value;
+            const obj ={
+               price,
+               quantity,
+               description
+            }
+            
+            axios.post("https://crudcrud.com/api/b3fbb3cc1e4942cc980a20f5e339ba68/storedata",obj)
+            .then((response)=>{
+                // console.log(response);
+              showonscreen(response.data);  
+            })
+            .catch((err)=>{
+                document.body.innerHTML=document.body.innerHTML+"<h4>somthing went wrong</h4>"
+            })
+            
+        }
+        window.addEventListener("DOMContentLoaded",()=>{
+            axios.get("https://crudcrud.com/api/b3fbb3cc1e4942cc980a20f5e339ba68/storedata")
+            .then((response)=>{
+               for(let i=0; i<response.data.length; i++)
+               { 
+                showonscreen(response.data[i]);
+               }
+            })
+            .catch((err)=>{
+                console.log(err);
+            })
+        })
+        function showonscreen(obj){
+
+             const parentele = document.getElementById('listofitem')
+             const childele = document.createElement('li')
+             childele.textContent = obj.price+'-'+obj.quantity+'-'+obj.description 
+             
+             const buybutton = document.createElement('input');
+             buybutton.type = "button";
+             buybutton.value = "clear";
+             childele.append(buybutton);
+             parentele.appendChild(childele);
+             buybutton.onclick = () =>{
+                axios.delete(`https://crudcrud.com/api/b3fbb3cc1e4942cc980a20f5e339ba68/storedata/${obj._id}`);
+                localStorage.removeItem(obj.product);
+                parentele.removeChild(childele);
+             }
+        }
+        
+    </script>
+</body>
+</html>
